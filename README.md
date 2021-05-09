@@ -26,4 +26,11 @@
 + Assembly language: 机器指令的一种符号代表
 + Machine language: 机器指令的二元代表
 
+### Morden ISAs:``80x86`` ``MIPS`` ``ARM`` ``PowerPC``
 
+### Technology Trends:
++ Vacuum tube 真空管
++ Transistor 晶体管
++ Integrated circuit（IC）集成电路
++ Very large scale IC 超大集成电路
++ Ultra large scale IC 超超大集成电路
