@@ -1,31 +1,38 @@
-# System-Architechture-review
-- [System-Architechture-review](#system-architechture-review)
-  - [Lecture02 Hierachy, Components & Technology](#lecture02-hierachy-components--technology)
-    - [Processor(CPU)](#processorcpu)
-    - [The ``IAS (von Neumann) Machine``](#the-ias-von-neumann-machine)
-    - [The hardware can oly understand ``binary representations``](#the-hardware-can-oly-understand-binary-representations)
-    - [Level of Programming Code](#level-of-programming-code)
-    - [Morden ISAs:``80x86`` ``MIPS`` ``ARM`` ``PowerPC``](#morden-isas80x86-mips-arm-powerpc)
-    - [Technology Trends:](#technology-trends)
-    - [MicroProcessor](#microprocessor)
-    - [Modern multicore Processor](#modern-multicore-processor)
-    - [Manufacturing Chips](#manufacturing-chips)
-  - [Computer Performance](#computer-performance)
-    - [Response Time and Throughput](#response-time-and-throughput)
-    - [Relative Performance](#relative-performance)
-    - [Measuring Performance](#measuring-performance)
-    - [CPU Clocking](#cpu-clocking)
-    - [CPU Time](#cpu-time)
-    - [Instruction Performance](#instruction-performance)
-    - [CPU Performance Equation](#cpu-performance-equation)
-  - [MIPS32 Programming](#mips32-programming)
-    - [Bit,Byte and Word](#bitbyte-and-word)
-    - [MIPS Introduction](#mips-introduction)
-    - [MIPS32 Structure](#mips32-structure)
-    - [Fetch-Execute Cycle (提取－执行周期)](#fetch-execute-cycle-提取执行周期)
-    - [MIPS Instruction Field 指令域值](#mips-instruction-field-指令域值)
-    - [Caller-saved Registers vs. Callee-saved Registers](#caller-saved-registers-vs-callee-saved-registers)
-    - [System call](#system-call)
+## Menu
+- [Menu](#menu)
+- [Lecture02 Hierachy, Components & Technology](#lecture02-hierachy-components--technology)
+  - [Processor(CPU)](#processorcpu)
+  - [The ``IAS (von Neumann) Machine``](#the-ias-von-neumann-machine)
+  - [The hardware can oly understand ``binary representations``](#the-hardware-can-oly-understand-binary-representations)
+  - [Level of Programming Code](#level-of-programming-code)
+  - [Morden ISAs:``80x86`` ``MIPS`` ``ARM`` ``PowerPC``](#morden-isas80x86-mips-arm-powerpc)
+  - [Technology Trends:](#technology-trends)
+  - [MicroProcessor](#microprocessor)
+  - [Modern multicore Processor](#modern-multicore-processor)
+  - [Manufacturing Chips](#manufacturing-chips)
+- [Computer Performance](#computer-performance)
+  - [Response Time and Throughput](#response-time-and-throughput)
+  - [Relative Performance](#relative-performance)
+  - [Measuring Performance](#measuring-performance)
+  - [CPU Clocking](#cpu-clocking)
+  - [CPU Time](#cpu-time)
+  - [Instruction Performance](#instruction-performance)
+  - [CPU Performance Equation](#cpu-performance-equation)
+- [MIPS32 Programming](#mips32-programming)
+  - [Bit,Byte and Word](#bitbyte-and-word)
+  - [MIPS Introduction](#mips-introduction)
+  - [MIPS32 Structure](#mips32-structure)
+  - [Fetch-Execute Cycle (提取－执行周期)](#fetch-execute-cycle-提取执行周期)
+  - [MIPS Instruction Field 指令域值](#mips-instruction-field-指令域值)
+  - [Caller-saved Registers vs. Callee-saved Registers](#caller-saved-registers-vs-callee-saved-registers)
+  - [System call](#system-call)
+- [MIPS Signedness (Lecture 5)](#mips-signedness-lecture-5)
+  - [Representing Negative Numbers](#representing-negative-numbers)
+  - [One's Complement to Represent Negative Numbers](#ones-complement-to-represent-negative-numbers)
+  - [Two's Complement Representation](#twos-complement-representation)
+  - [MIPS Logical Shift Operation](#mips-logical-shift-operation)
+  - [MIPS Multiplication Instructions](#mips-multiplication-instructions)
+  - [MIPS Division Instructions](#mips-division-instructions)
 ## Lecture02 Hierachy, Components & Technology
 
 ### Processor(CPU)
@@ -184,3 +191,44 @@
   + 把argument values填写进$a0,...$a3(or $f12 for floating point values)
 + May destroy ``$v0-$v1,$a0-$a3,$t0-$t9,$ra``
 + But always preserves $s0-$s7
+
+## MIPS Signedness (Lecture 5)
+
+### Representing Negative Numbers
++ 除去表达数字正负的一位数字后，剩下的七位数字可以表达的范围是(-127 to 127)
+
+### One's Complement to Represent Negative Numbers
++ Negative Numbers:
++ 取正数的二进制的NOT补码
++ 43:00101011
++ -43:11010100
+
+### Two's Complement Representation
++ Negative Numbers 通常由正数的二进制的NOT补码后末位加一
++ 这是最常用的在计算机中表达有符号整数的方法
++ 优势：
+  + 加减乘除法的运算和无符号的一样
+  + 这一特性允许系统可以更简单地处理高精度算术
+  + 此外，0 只有一种单独地表达方式，消除了和-0之间的微妙关系
+
+### MIPS Logical Shift Operation
++ ``sll $s0,$s1,2`` ``srl $s0,$s1,3``
+  + shift right logical and shift left logical
+  + shifts $s1 right/left 2 bits and stores the result in $s0
++ ``sra $s0,$s1,2``
+  + shift right arithmetical
+  + 位移$s1 2位，但符号保留``(performing sign extension)``
+
+### MIPS Multiplication Instructions
++ MIPS stores the 64 bit result of the multiplication of two 32 bit registers in two special 32-bit registers ``Hi and Lo``
++ ``mult $s1,$s2<br>mflo $s0``
++ can be encoded as one operation: ``mul $s0,$s1,$s2``
+  + 但是``mul``并不会检查overflow 但一个``pseudo-instruction伪指令``乘法可以实现检测overflow ``mulo``
+
+### MIPS Division Instructions
++ ``div $s1,$s2`` 实现了一个带符号的乘法，``余数reminder``放在Hi中，``商quotient``放在Lo中
++ 同样可以使用``mflo``来提取结果``mfhi``
++ 使用``div,divu``时添加三个变量则自动使用了一个伪指令，自动使用了mflo
+  + 例如 ``div $s0,$s1,$s2`` 等同于：
+    + div $s1,$s2
+    + mflo $s0
