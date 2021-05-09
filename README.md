@@ -34,3 +34,20 @@
 + Integrated circuit（IC）集成电路
 + Very large scale IC 超大集成电路
 + Ultra large scale IC 超超大集成电路
+
+### MicroProcessor
++ 包含一系列用wires电线关联起来的晶体管
++ 第一个商用的微处理器：Intel 4004
+
+### Modern multicore Processor
++ A single chip contains more than one microprocessor core
++ 同一个处理器芯片涵盖了多个微处理器核
++ 更小的晶体可以实现
+  + 每个芯片放置更多的晶体管
+  + 更多的处理能力
+  + 更便宜且更小的芯片
+
+### Manufacturing Chips
++ 芯片的制作工艺起于silicon硅，是半导体，导电性一般
++ 在进行特殊的工艺以后，既可以实现特别好的导电性，也可以实现特别好的绝缘性
++ 适合作为开关使用
