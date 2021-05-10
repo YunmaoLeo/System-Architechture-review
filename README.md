@@ -56,6 +56,9 @@
 - [Lecture 11 Introduction Pipelining](#lecture-11-introduction-pipelining)
   - [要求](#要求)
   - [Pipeline:](#pipeline)
+  - [为什么要让instructions Pipelining？](#为什么要让instructions-pipelining)
+  - [使用instruction pipelining的主要优势](#使用instruction-pipelining的主要优势)
+  - [A pipelined datapath 流水线数据路径](#a-pipelined-datapath-流水线数据路径)
 - [考试内容](#考试内容)
 ## Lecture02 Hierachy, Components & Technology
 
@@ -399,6 +402,30 @@ Chapter 11: Pipelined CPU Design
 + 多任务同时工作使用不同的资源
 + ``可能的速度提升potential speedup = Number pipe stages``
 + 阶段长度不平衡``unbalanced stage length``，以及管道的填充和排空过程``process of filling & draining``都会降低速度
+
+### 为什么要让instructions Pipelining？
++ 指令执行的不同平台使用不同的硬件模块
+
+### 使用instruction pipelining的主要优势
++ 节省时间，允许更高的``clock frequency``
++ Instruction fetch -> Reg ...........-> ALU -> Data access -> Reg
++ <................>Instruction fetch -> Reg -> ALU -> Data access -> Reg
++ 保证同一时间内每一硬件模块的工作不重复
+
+### A pipelined datapath 流水线数据路径
++ 设计一个``Pipelined Processor``流水线处理器
+  + 结合``single cycle datapath``开始
+  + 将数据路径区分成不同阶段
+    + ``IF(instruction fetch)``指令获取
+    + ``ID(instruction decode and register file read)``指令解码并且读取寄存器文件
+    + ``EX(execution or address calculation)``执行并进行地址运算
+    + ``MEM(data memory access)``从数据内存中获取数据
+    + ``WB(write back)``回写
+  + 将资源和阶段相关联``associate resources with stages``
+  + 保证flows之间不会互相冲突
+  + 在适当的平台增加控制``assert control in appropriate stage``
++ 增加``Pipeline register(latches)``来让datapth被区分成5个阶段
+
 
 
 
