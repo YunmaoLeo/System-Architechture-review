@@ -33,6 +33,20 @@
   - [MIPS Logical Shift Operation](#mips-logical-shift-operation)
   - [MIPS Multiplication Instructions](#mips-multiplication-instructions)
   - [MIPS Division Instructions](#mips-division-instructions)
+- [Machine Code, MIPS Addressing Lecture 06](#machine-code-mips-addressing-lecture-06)
+  - [MIPS Instruction Ecoding](#mips-instruction-ecoding)
+  - [Registers vs. Memory 寄存器 vs. 存储](#registers-vs-memory-寄存器-vs-存储)
+  - [Memory Hierarchy](#memory-hierarchy)
+  - [Data Transfer Instruction: ``Load Word``](#data-transfer-instruction-load-word)
+  - [Transfering Bytes and Halfwords:](#transfering-bytes-and-halfwords)
+  - [MIPS Memory Allcation](#mips-memory-allcation)
+- [Lecture 7 MIPS Procedure](#lecture-7-mips-procedure)
+  - [Callee vs Caller:](#callee-vs-caller)
+  - [MIPS Procedure Calling:](#mips-procedure-calling)
+  - [Procedure in MIPS:](#procedure-in-mips)
+  - [如果一个程序中有两个procedure且他们都使用$ra则会出现异常](#如果一个程序中有两个procedure且他们都使用ra则会出现异常)
+  - [参数传递：](#参数传递)
+  - [Recursive](#recursive)
 ## Lecture02 Hierachy, Components & Technology
 
 ### Processor(CPU)
@@ -232,3 +246,94 @@
   + 例如 ``div $s0,$s1,$s2`` 等同于：
     + div $s1,$s2
     + mflo $s0
+
+
+## Machine Code, MIPS Addressing Lecture 06
+
+### MIPS Instruction Ecoding
++ MIPS 有三种基本格式：``**R,I,J**``
++ ``R-format``: operands are `registers` only 操作只包含寄存器
++ ``I-format``: operands contain immediate 操作包含常数和两个寄存器
++ ``J-format``: operands are immediate only 操作只包含常数，用于跳转
+
+### Registers vs. Memory 寄存器 vs. 存储
++ Processor can access registers directly 处理器可以直接读取寄存器上的内容
++ MIPS32: limit of 32 registers 只有32个寄存器
++ 大部分程序需要的数据比能在寄存器内存放的多
+  + 这部分额外的数据则需要被存放在``memory``中
+    + `Load`: 将数据从memory转移到register
+    + ``store``: 将数据从register转移到memory
+
+### Memory Hierarchy
++ ``Register``
++ ``Main memory``
++ ``Hard disk``
++ 从上往下读取速度递减，容量递增
+
+### Data Transfer Instruction: ``Load Word``
++ Load word: ``lw a, n(b)
+  + i.e. ``a = Memory[b+n]``
+  + 地址必须是可以整除4的
+  + offset n 必须是16bit以内的
+    + ``-32768 <= n <= 32767``
++ Store word: ``sw a, n(b)
+  + ``Memory[b+n] = a``
+
+### Transfering Bytes and Halfwords:
++ ASCII 字符：1 byte，不同于 word: 4 bytes
++ Halfword: 2 bytes
++ MIPS32中为ASCII和Halfword进行数据转换的操作:
+  + ``lb/lbu`` load byte
+  + ``lh/lhu`` load halfword
+  + ``sb`` store byte
+  + ``sh`` store halfword
+  + halfwords的地址必须是2的倍数
+  + byte地址没有限制
+
+### MIPS Memory Allcation
++ 可以使用``sbrk`` system call 调用额外的memory
++ 下面的代码分配了16 bytes 的空间并且将新memory的地址返回到了$v0
+  + ``li $a0,16``
+  + ``li $v0, 9``
+  + ``syscall #sbrk``
+
+
+## Lecture 7 MIPS Procedure
+
+### Callee vs Caller:
++ Callee: 被调用的函数就是callee
++ Caller: 调用其他函数的函数
+
+### MIPS Procedure Calling:
++ 需要被传递的参数保存在寄存器``$a0 - $a3``
++ ``return value``返回值保存在寄存器``$v0 ($v1)``
++ ``return address``返回地址保存在``$ra``
++ ``jal label`` --- jump and link
+  + 这一指令用于调用一个函数，它执行以下操作:
+    + ``$ra: = PC + 4``
+    + PC := [label] and calls procedure at address label
++ ``jr rs`` --- jump register
+  + 这一操作用来将调用函数的``return address``返回给调用者
+
+### Procedure in MIPS:
++ 返回值被放在了``$v0``
+
+### 如果一个程序中有两个procedure且他们都使用$ra则会出现异常
++ 使用Stack进行解决，``后进先出``
++ ``$sp``: ``stack pointer``stack指针
++ ``$fp``: ``frame pointer``指向procedure frame的第一个word，不会在执行过程中变化
+
++ Push $s0 onto the stack:
+  + ``addi $sp,$sp,-4`` (在stack上分配空间)
+  + ``sw $s0,0($sp)`` (保存$s0,-- push)
++ Pop $s0 from the stack:
+  + ``lw $s0,0($sp)`` (pop $s0)
+  + ``addi $sp,$sp,4`` (deallocate space)
+
+### 参数传递：
++ 如果参数小于等于四，则在``$a0-$a3``进行传递
++ 如果大于四，则前四个在``$a0-$a3``进行传递，后面的放置在``stack``中
++ ``Return Value``保存在$v0,$v1中，如果返回值更多，则用``stack``
+
+
+### Recursive
