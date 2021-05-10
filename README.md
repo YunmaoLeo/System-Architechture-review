@@ -71,6 +71,7 @@
   - [Pasing messages through ``links and switches``](#pasing-messages-through-links-and-switches)
   - [Network Classifications](#network-classifications)
   - [Network Performance](#network-performance)
+  - [Network Performance: Delays延迟](#network-performance-delays延迟)
 - [考试内容](#考试内容)
 ## Lecture02 Hierachy, Components & Technology
 
@@ -520,7 +521,7 @@ Chapter 11: Pipelined CPU Design
   + 使用``TCP/IP``协议进行交流
 
 ### ISP
-+ ``Internet service provider(ISP)互联网服务提供商
++ Internet service provider(ISP)互联网服务提供商
   + ``Possess block of consecutive internet address``
   + Possess communication infrastructures such as links, routers, base stations, etc.
   + An institute and a person needs to subscribe to the ISP to be allocated IP addresses for their hosts to connect to the Internet.
@@ -596,8 +597,16 @@ Chapter 11: Pipelined CPU Design
   + 在一个单元时间内，通过一个``channel/port``传输的数据总量
   + 受到``bandwidth``带宽的限制
 
+### Network Performance: Delays延迟
++ ``Transmission delay 传输延迟``
+  + push所有数据到链接上花费的时间
++ ``Propagation delay 传播延迟``
+  + a bit通过传播媒介传输产生的延迟
+    + Free space: 3E+8 m/s
+    + ``Coaxial copper 同轴铜``: 2.3E+8 m/s
+    + ``Optical fiber 光纤``: 2E+8
 
-
++ ``Processing delay``
 ## 考试内容
 MIPS programming and ISA concepts
 • Chapters 1 & 2: Introduction
