@@ -72,6 +72,8 @@
   - [Network Classifications](#network-classifications)
   - [Network Performance](#network-performance)
   - [Network Performance: Delays延迟](#network-performance-delays延迟)
+  - [OSI model](#osi-model)
+  - [Layers:](#layers)
 - [考试内容](#考试内容)
 ## Lecture02 Hierachy, Components & Technology
 
@@ -607,6 +609,49 @@ Chapter 11: Pipelined CPU Design
     + ``Optical fiber 光纤``: 2E+8
 
 + ``Processing delay``
+  + 用于在路由器/接收者/发送者 处理数据包所花费的时间造成的延迟
++ ``Queuing delay``
+  + ``The time waiting for transmission in buffer`` packet处理完但还没有发送出去的时间造成的延迟
+
+
+
+### OSI model
++ Purpose of proposing the standard network architecture is to allow various network types to communication with each other ``筹备标准化的网络架构是为了不同的网络结构之间可以互相交流``
++ Initialized by ISO since 1977
++ ``OSI: Open System Interconnection model``:
+  + ``7-layered model``七层模型
+  + 每一层结构提供不同的服务
+  + 将复杂的问题转化为更简单的并且将困难限制在每一层内``confine the difficulties in each layer``
+  + Some recent notions combine layers 7 to 5 into 
+one application layer
+
+### Layers:
+  1. ``Pysical Layer``
+  2. ``Link Layer``
+    + Link layer protocol: ``Ethernet, WiFi``
+  3. ``Network Layer``
+    + protocol: ``IP protocol, many routing protocols``
+  4. ``Transport Layer``
+    + protocol: ``TCP,UDP``
+     + TCP protocol: 
+       + 为程序提供了面向连接的服务
+       + 将程序信息分割为了数个data segments
+       + 提供flow control - 发送，接受速度控制
+       + Provides congestion control - 如果网络拥塞，那么源会限制其传输速率
+     + UDP protocal:
+       + ``Connection less, no guarantee, no flow/congestion control.``
+  5. Application Layer
+    + protocol:
+      + ``HTTP``: for Web document request and transfer
+      + ``SMTP``: E-mail message transfer
+      + ``FTP``: files transfer between two end systems
+      + 程序员遵循协议写网络应用，程序通过 ``Transport layer``发送分为多个模块的信息  
+      + ``Presentation Layer``:提供数据加密服务，数据压缩，数据字节序``data encryption,data compression,data endianness``
+      + ``Session Layer``: Data synchronization, check-pointing,recovery数据同步，数据指向与恢复
+
+
+
+
 ## 考试内容
 MIPS programming and ISA concepts
 • Chapters 1 & 2: Introduction
