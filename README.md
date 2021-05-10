@@ -10,7 +10,7 @@
   - [MicroProcessor](#microprocessor)
   - [Modern multicore Processor](#modern-multicore-processor)
   - [Manufacturing Chips](#manufacturing-chips)
-- [Computer Performance](#computer-performance)
+- [Lec 03 Computer Performance](#lec-03-computer-performance)
   - [Response Time and Throughput](#response-time-and-throughput)
   - [Relative Performance](#relative-performance)
   - [Measuring Performance](#measuring-performance)
@@ -46,7 +46,17 @@
   - [Procedure in MIPS:](#procedure-in-mips)
   - [如果一个程序中有两个procedure且他们都使用$ra则会出现异常](#如果一个程序中有两个procedure且他们都使用ra则会出现异常)
   - [参数传递：](#参数传递)
-  - [Recursive](#recursive)
+  - [Recursive in MIPS](#recursive-in-mips)
+- [Lecture 09 ALU-Design](#lecture-09-alu-design)
+  - [Digital building blocks:](#digital-building-blocks)
+- [Lecture 10 Single-Cycle-CPU](#lecture-10-single-cycle-cpu)
+  - [Instruction execution process(general)](#instruction-execution-processgeneral)
+  - [Datapath needs the following hardware:](#datapath-needs-the-following-hardware)
+  - [Truth Table of Control Signals](#truth-table-of-control-signals)
+- [Lecture 11 Introduction Pipelining](#lecture-11-introduction-pipelining)
+  - [要求](#要求)
+  - [Pipeline:](#pipeline)
+- [考试内容](#考试内容)
 ## Lecture02 Hierachy, Components & Technology
 
 ### Processor(CPU)
@@ -96,7 +106,7 @@
 + 适合作为开关使用
 
 
-## Computer Performance
+## Lec 03 Computer Performance
 
 ### Response Time and Throughput
 + ``Response time` (execution time):程序执行一个任务所需要花费的总时间
@@ -333,7 +343,120 @@
 ### 参数传递：
 + 如果参数小于等于四，则在``$a0-$a3``进行传递
 + 如果大于四，则前四个在``$a0-$a3``进行传递，后面的放置在``stack``中
-+ ``Return Value``保存在$v0,$v1中，如果返回值更多，则用``stack``
++ ``Return Value``保存在``$v0,$v1``中，如果返回值更多，则用``stack``
 
 
-### Recursive
+### Recursive in MIPS
+
+
+## Lecture 09 ALU-Design
+
+### Digital building blocks:
++ Gates, arithmetic circuits, multiplexers, decoders, registers, counters, memory arrays, logic arrays, etc
++ Register
+  + stores data in a circuit
+  + uses a ``clock signal`` to deter mine when to update the stored value
+  + Edge-triggered: update when Clk changes from 0 to 1 (rising edge)
+  + Synchronous circuit: 同步电路
+
+
+## Lecture 10 Single-Cycle-CPU
+
+### Instruction execution process(general)
++ PC -> instruction memory, fetch instruction
++ Register numbers -> register file, read registers
++ Depending on instruction types
+  + Use ALU to calculate
+  + Access data memory for load/store
++ PC -> target address or PC + 4
+
+### Datapath needs the following hardware:
++ ``Memory``: store instructions and data
++ Registers(32 x 32)
+  + read RS
+  + read RT
+  + write RT or RD
++ PC
++ Extender for zero- or sign-extension
++ Calculating values in registers or extended immediante(ALU)
++ Add 4 or extended immediante to PC
+
+### Truth Table of Control Signals
++ (6 Inputs and 9 Outputs)
++ ``RegDst, ALUSrc, MemtoReg, RegWrite, MemReadm, MemWrite, Branch, ALUop1, ALUop0``
+
+
+## Lecture 11 Introduction Pipelining
+### 要求
+Chapter 11: Pipelined CPU Design
+• Describe the pipelined behavior for instruction execution:
+  • At which cycle, which instruction is executing at which stage
+  • At a certain stage, which component in CPU is functioning: reading/writing registers/
+
+### Pipeline:
++ 对单个任务的延迟没有帮助，但是可以提高整体的吞吐量
++ ``Pipeline rate``被最慢的阶段所限制
++ 多任务同时工作使用不同的资源
++ ``可能的速度提升potential speedup = Number pipe stages``
++ 阶段长度不平衡``unbalanced stage length``，以及管道的填充和排空过程``process of filling & draining``都会降低速度
+
+
+
+
+## 考试内容
+MIPS programming and ISA concepts
+• Chapters 1 & 2: Introduction
+• Generalunderstanding,vonNeumannarchitecture
+• Chapter 3: Computer Performance
+• All concepts (various performance metrics, power, Amdahl’s law) except SPEC benchmarks.
+• Chapter 4: MIPS programming
+• All concepts and instructions: arithmetic, logical, branch/jump, etc.
+• MIPS instruction formats.
+• Syscall will not be covered.
+• Chapter 5: MIPS Signedness
+• All concepts and instructions except multiplication and division.
+• Chapter 6: MIPS addressing (Also look at Week 7: MIPS-ISA-Revisited) • All concepts and instructions except MIPS addressing modes.
+• Chapter 7: MIPS procedures
+• All concepts and instructions.
+• Chapter 8: Floating point representations • Everything up to page 19.
+
+CPU design
+• Chapter 9: ALU Design
+• All concepts including
+• basic hardware principles and functionalities
+• 1‐bit ALU design principle, schematic, and control
+• Add, Sub, And, Or, Slt, Nor, Nand, etc.
+• Chapter 10: Single-Cycle CPU design
+• All concepts including
+• Drawing the datapaths forR-type,lw,sw,beqinstructions.
+• You don’t need to know how the controller is designed, but need to know what are the corresponding control signals required to make the components work properly.
+
+CPU design
+Chapter 11: Pipelined CPU Design
+• Describe the pipelined behavior for instruction execution:
+• At which cycle, which instruction is executing at which stage
+• At a certain stage, which component in CPU is functioning: reading/writing registers/memories, ALU calculation, branching, sign extension, etc.
+• Identify the possible RAW data hazard (both for R-type and lw instructions)
+• Indicate the stalling and forwarding methods applied to mitigate the data hazard.
+• Draw arrows and bubbles on the pipeline, as in the lab questions
+• Know that control hazard cannot be completely removed, but can use early branching for performance
+improvement.
+• Calculate the CPI
+• The ideal CPI for pipelined processor is 1
+• The CPI for ‘lw’ is dependent on whether there is data hazard.
+• The CPI for branching is dependent on whether the branch is taken.
+• Calculate the average CPI for ‘lw’ and ‘beq’ considering hazard
+• Calculate the average CPI of the overall CPU given the percentage of each kind of instruction.
+• Calculate the total execution time of the pipeline
+• For a piece of assembly code, calculate the total execution time w or w/o hazard
+• Not in exam: pp. 41, 44, 48, 49
+
+Computer Networking
+• Basic concepts and classifications
+• Performance measures
+• 7/5 layer protocol models
+• IP addressing
+• Notation, classification, subnet, CIDR
+• Routing protocols
+• General concepts and the Router Information Protocol
+• Note: all content in lecture notes could appear, so, read and comprehend everything in Chapter 12.
