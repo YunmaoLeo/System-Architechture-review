@@ -59,6 +59,18 @@
   - [为什么要让instructions Pipelining？](#为什么要让instructions-pipelining)
   - [使用instruction pipelining的主要优势](#使用instruction-pipelining的主要优势)
   - [A pipelined datapath 流水线数据路径](#a-pipelined-datapath-流水线数据路径)
+  - [Consider ``load`` instruction](#consider-load-instruction)
+  - [Pipelined control](#pipelined-control)
+  - [为什么MIPS中运用Pipeline更简单？](#为什么mips中运用pipeline更简单)
+  - [Hazards: types of hazard](#hazards-types-of-hazard)
+- [Lecture 12 Computer - Networking](#lecture-12-computer---networking)
+  - [Introduction](#introduction)
+  - [Network, internetwork, and Internet](#network-internetwork-and-internet)
+  - [ISP](#isp)
+  - [Network organizations](#network-organizations)
+  - [Pasing messages through ``links and switches``](#pasing-messages-through-links-and-switches)
+  - [Network Classifications](#network-classifications)
+  - [Network Performance](#network-performance)
 - [考试内容](#考试内容)
 ## Lecture02 Hierachy, Components & Technology
 
@@ -426,7 +438,163 @@ Chapter 11: Pipelined CPU Design
   + 在适当的平台增加控制``assert control in appropriate stage``
 + 增加``Pipeline register(latches)``来让datapth被区分成5个阶段
 
+### Consider ``load`` instruction
++ IF:``Fetch the instruction from the instruction Memory``从指令储存处获取指令
+  + IR ＝ mem[PC];PC=PC+4
++ ID:``Registers fetch and instruction decode``读取寄存器并进行指令解码
+  + A = Reg[IR[25-21]]; B = Reg[IR[20-16]];
++ EX:``Calculate the memory address``计算储存地址
+  + ALUout = A + sign-ext(IR[15-0])
++ MEM:``Read the data from the data Memory``从数据内存中获取数据
+  + MDR = mem[ALUout] 
++ WB:将数据回写入寄存器文件
+  + Reg[IR[20-16]] = MDR
 
++ `R-type instructions中只有``IF ID EX WB``四个阶段`
++ 因为Load操作和R-type的操作步骤不一样，在执行流水化进程的时候可能会出现问题
+  + 所以R-type同样使用五步，只是``MEM``是一个什么都不做的阶段``nothing is executed in this stage``
+
++ 然而 ``store``操作也只有四步``IF ID EX MEM``
+  + 同样的，我们添加一个什么都不做的``WB``阶段
++ 无独有偶，``beq``只有三个阶段``IF ID EX``
+  + 我们添加两个额外的阶段``MEM WB``，但什么都不做
+
+### Pipelined control
++ Control signals are pipelined just like the datapath
+  + ``Main controller``主控制器在ID阶段生成``control signals``
+
+### 为什么MIPS中运用Pipeline更简单？
++ ``All instructions are of the same length``
++ ``Just a few instruction format``
++ 1. 所有指令都有相同的长度
++ 2. 只有几种指令类型
+
++ ``hazards`` makes pipelining hard
+
+### Hazards: types of hazard
++ Pipeline Hazards:
+  + Structural hazards:
+    + ``尝试在相同的时间内用两种不同的方式使用资源``
+  + Data hazards:
+    + ``尝试在数据可使用之前就使用``
+    + ``需要使用的 前一条指令生成的数据 仍然在pipeline当中``
+  + Control hazards:
+    + ``Attempt to make decision before conditions is evaluated``
+    + 通常发生在``branch instructions``
+  + 通常可以使用waiting来解决
+    + Pipeline controller必须要能够检测harzard
+    + 要采取行动，或拖延行动来解决hazards
+
++ Handling data hazards
+  + Method1 : ``inserting NOP``
+  + Method2 : ``Forwarding`` (for R-type instructions)
+    + Hardware solution, feed the $2 values directly to ALU read-in ports. Don’t have to wait until the WB stage.
+  + Method3 : ``Stalling`` (for load instructions)
+    + Stall pipeline by “freezing” or duplicating the control/data values. Namely,
+ inserting a bubble in the pipeline.
+<br>
+
++ Handling branch hazards
+  + 当我们想要通过分支来进行跳转操作的时候，有些指令就已经正在进行了
+  + 补救措施：
+    + ``将移动分支的执行放在更早的位置``
+      + ``Move up branch address calculation to ID``
+      + ``Check branch equality at ID (using XOR) by comparing the two registers read during ID``
+      + ``Branch decision made at ID => only one instruction to waste``
+      + ``Add a control signal, IF.Flush, to zero instruction field of IF/ID => making the instruction an NOP``
+    + ``使用动态预测（loop）``
+
+
+## Lecture 12 Computer - Networking
+
+### Introduction
++ 计算机网页不只是一个交流设施``communication infrastructure``,也是一个信息服务设施
+
+### Network, internetwork, and Internet
+
++ ``Network``：composed of several nods which are connected by the links
+  + A ``node`` 可以是笔记本，台式机，打印机或者是手机，或者也可以是路由器和交换机
+  + 可以是有线或无线的
++ ``Internetwork``: `multiple networks interconnected`（路由器）``Network of Networks``
++ ``Internet``: largest internetwork
+  + 使用``TCP/IP``协议进行交流
+
+### ISP
++ ``Internet service provider(ISP)互联网服务提供商
+  + ``Possess block of consecutive internet address``
+  + Possess communication infrastructures such as links, routers, base stations, etc.
+  + An institute and a person needs to subscribe to the ISP to be allocated IP addresses for their hosts to connect to the Internet.
+
+### Network organizations
++ ``End systems(edge of the network)``
+  + 也叫做``hosts``,他们是承载着应用的计算系统
+  + PC, smartphone, XBoX, online TV, intelligent temperature sensors, intelligent home appliances (aircons, fridges, etc.), servers.
++ ``Access networks``接入网
+  + The network that connects hosts to the first router on their paths to further networks
+  + 家庭：DSL，cable电缆，optical fiber光纤
+  + 组织企业：Ethernet以太网路 WIfi
++ ``The network core``
+  + 用于传递信息，将相当大数量的子网络和路由器组成在一起
+  + 路由器适用于交换信息的重要计算机器
+
+### Pasing messages through ``links and switches``
++ ``Circuit switching电路切换``
+  + ``buffers,link transmission rates``保留传输消息所需的资源（缓冲区，链接传输速率）以保证服务。
+  + 传输感觉就像是穿行在专用链接``dedicated link``
+  + Implemented in ``FDM or TDM``
+  + 如果两个hosts之间传输不规则数据，那么``not in hight utilization``
++ ``Pros``优点
+  + 只有很小的交流延迟
+  + 有序传输``ordered transmission``
+  + 同时适用于数字信号和模拟信号的传输``digital and analog signal transmission``
+  + ``esay control``
++ ``Cons``缺点
+  + ``Long establishment time``需要的建立时间长
+  + ``Low efficiency``低效率
+  + ``Fault-prone: need to re-establish connection if any point in middle is broken``容易出错，如果在其中的任何点断开，都需要重新建立链接
+<br>
+
++ ``Packet switching``:
+  + 信息被分成不同的``packets``，每一个packet有一个header来指示终点
+  + 路由器中的缓冲器``buffer``可能是满的，这个可能会被丢掉
+    + ``Best effort transmission``
+  + 因为不需要保留带宽``bandwidth``，所以使用效率很高
+  + 需要适合的路由协议或算法来高效传输packets
++ 优点
+  + 不需要建立连接
+  + ``high link utilization``链接利用率高
++ 缺点
+  + ``Extra packet length for headers``需要给包的header提供额外的长度
+  + ``Extra forwarding delays``额外的转发延迟
+  + ``Needs to re-order received packets at the destination``需要在到达终点后重新排列包
+
+### Network Classifications
++ By users
+  + ``Public networks``公有网络
+  + ``Private networks``Military, transportation, utility, etc.
++ By transmission media
+  + ``wired``/``wireless``
++ By coverage 覆盖范围
+  + ``WAN``: wide area network 大范围的网络连接 成千上万miles
+  + ``MAN``: metropolitan area networks都市范围的网络 5~50 miles
+  + ``LAN``: local area networks 本地的高速网络链接
+  + ``PAN``: personal area networks 个人网络连接，鼠标通过蓝牙连着电脑
++ By ``topology``拓扑
+  + ``Bus-based``
+  + ``Centeralized network``
+  + ``Ring network`` 环状网络
+  + ``Mesh network`` 网状网络
+
+### Network Performance
++ Rate:
+  + 传输的速率，也叫做``bit rate`` / ``data rate``
+  + bits per second: `bps`
+  + ``kbps, Mbps, Gbps``
++ ``Bandwidth带宽``
+  + The highest data rate that can be measured between two transmission partied in a unit time.在一个单位时间内可以实现的``最高速率``, 同样使用``bps``核算
++ ``Throughput通量``
+  + 在一个单元时间内，通过一个``channel/port``传输的数据总量
+  + 受到``bandwidth``带宽的限制
 
 
 
