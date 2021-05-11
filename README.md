@@ -650,8 +650,6 @@ one application layer
       + ``Session Layer``: Data synchronization, check-pointing,recovery数据同步，数据指向与恢复
 
 
-
-
 ## 考试内容
 MIPS programming and ISA concepts
 • Chapters 1 & 2: Introduction
