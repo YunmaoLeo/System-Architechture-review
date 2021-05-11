@@ -74,6 +74,16 @@
   - [Network Performance: Delays延迟](#network-performance-delays延迟)
   - [OSI model](#osi-model)
   - [Layers:](#layers)
+  - [IP addressing](#ip-addressing)
+  - [IP 地址分类](#ip-地址分类)
+  - [Public address v.s. private address](#public-address-vs-private-address)
+  - [IP地址分类的缺点：](#ip地址分类的缺点)
+  - [Subnet division 子网划分](#subnet-division-子网划分)
+  - [Classless Inter-Domain Routing(CIDR) ``无类域间路由``](#classless-inter-domain-routingcidr-无类域间路由)
+  - [Router for IP packet relaying ``IP数据包中继路由器``](#router-for-ip-packet-relaying-ip数据包中继路由器)
+  - [Routing protocol design](#routing-protocol-design)
+  - [Routing Information Protocol(RIP) 路由信息协议](#routing-information-protocolrip-路由信息协议)
+  - [RIP strategy:](#rip-strategy)
 - [考试内容](#考试内容)
 ## Lecture02 Hierachy, Components & Technology
 
@@ -648,6 +658,131 @@ one application layer
       + 程序员遵循协议写网络应用，程序通过 ``Transport layer``发送分为多个模块的信息  
       + ``Presentation Layer``:提供数据加密服务，数据压缩，数据字节序``data encryption,data compression,data endianness``
       + ``Session Layer``: Data synchronization, check-pointing,recovery数据同步，数据指向与恢复
+
+### IP addressing
++ IPv4 addresses
+  + 用来判断是``host``还是``router``,当发送或接受IP packets时
+  + IP 地址是32位的，通常使用``dotted-decimal notation``来表示 ``193.32.216.9``
+  + 每一个地址都需要是独一无二的，每一个host都需要独一无二的标识
+  + 它需要是普遍通用的，他的地址空间应该要能够迎合互联网需求，不可以崩溃
+    + 但现在我们逐步走入``IoT(Internet-of-Things)``,万物互联，身边的每一个事物都需要IP地址
+    +  IPv6： 128位，可以表示3.4E+38个
+
+### IP 地址分类
++ Class A：``0[Network-ID 7][Host-ID 24]``
+  + networkID:``000 0000``, ``111 1111`` are reserved
+  + 总共有 ``2^7 -2 = 126 networks``可用
+  + 在每个Class A的网络中，总共有 ``2^24-2 = 16777214`` hosts可用 ``不可用的2分别为全都是0 全都是1``
++ Class B: ``10[Network-ID 14][Host-ID 16]``
+  + 最小的network address: ``128.0.0.0``
+  + 最大的network address: ``191.255.255.254``
+  + 在每个Class B network中，总共有 ``2^16 -2 = 65534`` host address
++ Class C: ``110[Network ID 21][Host-ID 8]``
+  + 最小的network address: ``192.0.0.0``
+  + 最大的network address: ``223.255.255.0``
+  + Class C中共有``2^21=2097152``个可用的网络
+  + 最小的host address: 192.0.0.1
+  + 最大的host address: 223.255.255.254
+  + Class C中每个网络有``2^8-2 = 254``个host address
++ Class D(multicast): ``1110[Multicast address 28]``
++ Class E(reserved): ``1111[unsued 28]``
+<br>
+
++ 只有``Class A B C``可以分配给主机和路由器
++ 一个 全部都是`0`的ID不可以拿来给主机或路由器分配ID，它旨在用作``network address``而不是``host adderss``
++ 一个 全部都是`1`的ID不可以拿来给主机或路由器分配ID，``it is meant to address a broadcast message to all hosts in this network``旨在将广播信息发送给该网络中的所有主机
+
+### Public address v.s. private address
++ 通常会设定一些列地址专门用于``private usages``,只在内部网络中使用它们
++ Class A: ``10.z.y.x``
++ Class B: ``172.16.y.x``
++ Class C: ``192.168.y.x``
+
+### IP地址分类的缺点：
++ 假设一个有三百台主机的学校要设立网络，那么Class C因为最大的主机限制为254，那么则选用了Class B
+  + 然而Class B的可用主机IP有65534个，远超300，``有相当一部分的主机地址没有得到有效利用``
++ 接下来，在这个学校决定分为三个校区，每个都独立运行
+  + 如果应用两个新的Class B networks，则会面临``很高的费用与等待时间``,``每个Class B network中被浪费的主机地址更多了``
+
+### Subnet division 子网划分
++ 这会将一批连续的Class C地址分配给需要超过254个地址的``子网subnet``
++ 换句话说，这使得将Class B地址空间划分为多个子网
++ ``subnet mask子网掩码``实现了子网的划分
+  + 指示``host ID``中有多少位bits是被借出用来表示``subnet ID``的
++ 例子
+  + 给定network address:``218.75.230.0``,及其subnet mask:``255.255.255.128``
+    + 首先,这是一个属于Class C的IP地址
+    + 所以network address应该对应Class C的subnet mask：``255.255.255.x``
+    + subnet 0: ``218.75.230.0 to 218.75.230.127``
+    + subnet 1: ``218.75.230.128 to 218.75.230.255``
+    + each subnet also has to exclude all 0s and all 1s when considering subnet host addresses.
+
+### Classless Inter-Domain Routing(CIDR) ``无类域间路由``
++ A generalized subnet addressing notion,广义的子网寻址概念
++ 使用新的地址格式：
+  + ``a.b.c.d/x``: ``128.14.35.7/20``
+  + 意思是，地址``128.14.35.7``属于并使用前20位来表示子网地址，剩下的12位给了``continuous host address range(named CIDR block)`` unber this subnet address
+  + 这个CIDR block 可以aggregate多少class C networks？
+    + Answer: ``number of host addresses in CIDR block``/``number of host addresses in a class C network``:
+      + ``2^(32-20) / 2^8``
+
+### Router for IP packet relaying ``IP数据包中继路由器``
++ General router architecture 通用路由器架构
+  + `Input port 输入端口`
+    + 包含``Physical/Link/Network layers protocol`` to process(remove) the packet heads
+    + 还包含``input buffer``输入缓冲器来存储packet包
+  + `Switch fabric 交换结构`
+    + ``Cross-bar circuits``(交叉电路) to interconnect input ports and output ports,交叉电路让输入与输出口相连
+    + 可以使用``reconfigurable circuits``可重构电路来实现
+  + `Routing processor 路由处理器`
+    + 执行``routing protocols``路由协议并维护路由表和有关链接状态的信息
+  + `utput port 输出端口`
+    + ``Modify packet heads`` according to routing results 修改数据包头
+    + 执行``Network/Link/Pysical layers protocols``来重新把heads加上
+    + 包含输出缓冲器``output buffer``
+
+### Routing protocol design
++ Two routing paradigms两种路由范例: ``static routing静态路由``和``dynamic routing动态路由``
++ ``static routing``:
+  + ``Manully configured手动配置`` 运行过程中``设定settings``不会被改变
+  + ``Low-to-zero`` decision making cost，决策成本低或接近没有
+  + 不能够适应动态的网络情况``dynamic network conditions``比如``network topology change or cengestion status网络拓扑改变或拥塞状态``
+  + 在小规模网络中使用``small-scale networks``
++ ``Dynamic routing``
+  + 根据路由协议自动配置``Automatically configured by routing protocols``
+  + 适应实时网络条件``Adaptable to real-time network conditions``
+  + ``Large desicion making cost``，决策成本高
+  + 在大型网络中使用``large-sclae networks``
++ ``Routing criteria 路由标准``
+  + ``Distance Vector 距离向量``: 
+    + 每一个路由器维护一个``routing table路由表``来记录它和终点网络之间的距离
+  + ``Link-State 链接状态``:
+    + 每一个路由器基于做出的决策，预估总体的链接拥塞情况 ``Each router estimates the overall link congestion level``
+
+
+### Routing Information Protocol(RIP) 路由信息协议
++ 一个基于距离向量的算法 ``distance vector-based algorithm``
++ 每个路由器都会维持一个``distance between it and the destination``
+  + 距离通过其他路由器的数量``(hops)``来衡量
+    + 举例，现有:
+      + ``N1 -> R1 -> N2 -> R2 -> N3 -> R3 -> N4`` (N: network, R: router)
+      + ``Distance(R1 to N1) = 1``
+      + ``Distance(R1 to N3) = 1 + 1 =2``
+  + 一般来说，距离越短，数据包越容易被路由器传输
+  + 最大的距离允许是15， 所以一般使用在小型的网络中 ``A Maximum distance of 15``
+
+
+### RIP strategy:
++ 一个路由器持续地和其他路由器交换信息``A router constantly exchanges its info with other routers``
+  + 和谁交换：它的邻居路由器``neighbor router``
+  + 交换什么: ``route table``
+  + 什么时候交换: ``periodically 周期性的`` 比如每三十秒
+  + 怎么交换: ``update rules``
+
+
+
+
+
 
 
 ## 考试内容
