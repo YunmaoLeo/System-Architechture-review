@@ -137,8 +137,8 @@
 ## Lec 03 Computer Performance
 
 ### Response Time and Throughput
-+ ``Response time` (execution time):程序执行一个任务所需要花费的总时间
-+ ``Throughput(bandwidth带宽)``:每个单元时间内可以完成的人物数量
++ ``Response time`` (execution time):程序执行一个任务所需要花费的总时间
++ ``Throughput(bandwidth带宽)``:每个单元时间内可以完成的任务数量
 + 两者的影响因素
   + 将处理器processor替换成更快的版本
   + 给系统增加处理器来实现多核任务处理
