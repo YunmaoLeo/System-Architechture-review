@@ -47,6 +47,8 @@
   - [如果一个程序中有两个procedure且他们都使用$ra则会出现异常](#如果一个程序中有两个procedure且他们都使用ra则会出现异常)
   - [参数传递：](#参数传递)
   - [Recursive in MIPS](#recursive-in-mips)
+- [Lecture 08 Floating Point](#lecture-08-floating-point)
+  - [Two representations:](#two-representations)
 - [Lecture 09 ALU-Design](#lecture-09-alu-design)
   - [Digital building blocks:](#digital-building-blocks)
 - [Lecture 10 Single-Cycle-CPU](#lecture-10-single-cycle-cpu)
@@ -212,7 +214,7 @@
   + ``Write back回写``：操作的结果会被写入合适的寄存器，Program Counter(PC) 会被更新到一个新的地址，并且进行下一轮的获取指令
 
 ### MIPS Instruction Field 指令域值
-+ General Format: ``op``6bits ``rs``5bits ``rt``5bits ``rd``5bits ``shamt``6bits ``funct``6bits
++ General Format: ``op``6bits ``rs``5bits ``rt``5bits ``rd``5bits ``shamt``5bits ``funct``6bits
 + ``op``: operation code: basic operation of the instruction
 + ``rs``: first source register operand
 + ``rt``: second source register operand
@@ -376,6 +378,20 @@
 
 ### Recursive in MIPS
 
+## Lecture 08 Floating Point
+
+### Two representations:
++ Single precision(32-bit)
++ Double precision(64-bit)
+
+``x = (-1)^s + (1+Fraction) * 2^(BiasedExponent-Bias)``
++ S: sign bit of the fraction  
++ S -> Biased Exponent -> Fraction
+
++ Single:precision (32-bit)
+  + ``s(1-bit)+e(8-bit)+fraction(23-bit)`` 
++ Double-precision (64-bit)
+  + ``s(1-bit)+e(11-bit)+fraction(52-bit)``
 
 ## Lecture 09 ALU-Design
 
