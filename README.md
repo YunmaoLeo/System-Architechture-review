@@ -188,9 +188,9 @@
 
 ### MIPS Introduction
 + MIPS:``Microprocessor without Interlocked Processor States``没有互锁处理器状态的微处理器
-  + ``Instruction Set Architecture(ISA)`` based on Reduced ``Instruction Set Computing(RISC)``
+  + ``Instruction Set Architecture(ISA)`` based on ``Reduced Instruction Set Computing(RISC)``
   + 使指令更简单了，但执行的速度更快
-  + 相对于``Complex Instruction Set Computing (CISC):
+  + 而``Complex Instruction Set Computing (CISC)``:
     + 更`expensive/slow`的memory,写machine code困难
 + 32位的版本由1980年斯坦福团队推出
   + 基本概念是通过使用``deep instruction pipelines深度指令流水线``提升性能
@@ -206,7 +206,7 @@
 + 每一个可编程处理器都实现了一个``fetch-execute cycle 提取－执行周期``
 + 由处理器硬件自动实现，允许处理器遍历程序步骤
 + 通常涵盖四步：
-  + ``Fetch the instructoon获取指令`` :从**Program Counter**中的memory address内获取下一个指令，保存在``Instruction Register(IR)``内，在获取操作的尾端，PC又回指向下一个指令
+  + ``Fetch the instruction获取指令`` :从**Program Counter**中的memory address内获取下一个指令，保存在``Instruction Register(IR)``内，在获取操作的尾端，PC又回指向下一个指令
   + ``Decode the instruction解码指令``: 被编码的指令储存在``Instruction Register(IR)``内，它们将会被decoder进行解释
   + ``Execute the instruction``
   + ``Write back回写``：操作的结果会被写入合适的寄存器，Program Counter(PC) 会被更新到一个新的地址，并且进行下一轮的获取指令
