@@ -18,6 +18,10 @@
   - [CPU Time](#cpu-time)
   - [Instruction Performance](#instruction-performance)
   - [CPU Performance Equation](#cpu-performance-equation)
+  - [Program Performance:](#program-performance)
+  - [The Power Wall](#the-power-wall)
+  - [Amdahl's Law](#amdahls-law)
+  - [Law of Diminishing returns:](#law-of-diminishing-returns)
 - [MIPS32 Programming](#mips32-programming)
   - [Bit,Byte and Word](#bitbyte-and-word)
   - [MIPS Introduction](#mips-introduction)
@@ -49,6 +53,7 @@
   - [Recursive in MIPS](#recursive-in-mips)
 - [Lecture 08 Floating Point](#lecture-08-floating-point)
   - [Two representations:](#two-representations)
+  - [一些Single Precision的特殊值：](#一些single-precision的特殊值)
 - [Lecture 09 ALU-Design](#lecture-09-alu-design)
   - [Digital building blocks:](#digital-building-blocks)
 - [Lecture 10 Single-Cycle-CPU](#lecture-10-single-cycle-cpu)
@@ -62,6 +67,7 @@
   - [使用instruction pipelining的主要优势](#使用instruction-pipelining的主要优势)
   - [A pipelined datapath 流水线数据路径](#a-pipelined-datapath-流水线数据路径)
   - [Consider ``load`` instruction](#consider-load-instruction)
+  - [Consider ``R-type`` instruction](#consider-r-type-instruction)
   - [Pipelined control](#pipelined-control)
   - [为什么MIPS中运用Pipeline更简单？](#为什么mips中运用pipeline更简单)
   - [Hazards: types of hazard](#hazards-types-of-hazard)
@@ -181,6 +187,41 @@
 + ``CPU Time = Instruction Count * CPI * Clock Cycle Time``
 + ``CPU Time = Instuction Count * CPI / Clock Rate``
 
+### Program Performance:
++ Algorithm:
+  + Affects instruction count
+  + Possibly affects CPI - by favoring slower or faster instructions
++ Programming language
+  + Affects instruction count
+  + Affects CPI - because of ites own features
++ Compiler:
+  + Affects instruction count
+  + Affects CPI
++ ISA:
+  + Affects instruction count
+  + Affects CPI, clock rate
+
+### The Power Wall
++ The dominant technology for integrated circuits is called ``CMOS``
++ The ``primary source`` of energy consumption is so-called ``dynamic energy``
+  + consumed when transistors switch states from 0 to 1 and vice versa
+  +  能量消耗的主要部分是动态能量，主要用于晶体管状态0和1之间的切换
++ Dynamic energy depends on the ``capacitive loading`` of each transistor and the ``voltage applied``
+  + 动态能量主要取决于晶体管的电容性负载和施加的电压
+    + ``Energy 正比于 Capacitive load x Voltage^2``
+  + Energy of a single transistion:
+    + ``Energy 正比于 0.5 x Capacitive load x Voltage^2``
+  + The power required per transistor dependes on the capacitive loading, voltage and the frequency of transitions:
+    + ``Power 正比于 0.5 x Capacitive load x Voltage^2 x Frequency``
+
+### Amdahl's Law
++ Amdahl's law: The performance enhancement possible with a given improvement is limitied by the amount that the improved feature is used
+  + 进行改进后可能会提高性能，但受限于改进功能的使用量
++ The execution time of the program after making the improvement is :
+  + ``Time of improved = (Time of affected / improvement t factor) + Time of unaffected``
+
+### Law of Diminishing returns:
++ 在生产过程中增加为增加某一因素，别的不变，会在某一个点到达收益的顶峰
 
 ## MIPS32 Programming
 ### Bit,Byte and Word
@@ -390,8 +431,30 @@
 
 + Single:precision (32-bit)
   + ``s(1-bit)+e(8-bit)+fraction(23-bit)`` 
+  + bias = 127
 + Double-precision (64-bit)
   + ``s(1-bit)+e(11-bit)+fraction(52-bit)``
+  + bias = 1023
+
++ Example of ``Single Precision Example``:
++ 计算步骤：先转换为科学计数法，然后将第二个部分Biased Exponent加上bias转换为二进制，最后把小数部分写上
+  + Floating Point Format: -10.101
+  + Step 1: normalize number: (-1) x 1.0101 x 2^1
+  + Step 2: Sign =1, fraction F=0101
+  + ``Biased Exponent E = Actural Exponent + Bias``
+  + =1 + 127 = 128 = 1000 0000(2)
+    + ``|1|E=1000 0000|F=0101 0000 0000 0000 0000 000|``
+
+### 一些Single Precision的特殊值：
++ smallest positive normalized number：1.0 * 2^(-126)
++ least negative normalized number: -1.0 * 2^(-126)
++ Largest positive normalized number: 1.1111 111...111 * 2^127
+
++ 在大部分电脑中，0.3 + 0.2 != 0.5
+  + 这是因为0.3和0.2都没有确切的二进制表达方法，都是无限循环数
++ 要比较两个数字是否相等：应该使用以下方法：
+  + |0.3+0.2-0.5| < x
+  + x 应该为一个非常小的数字
 
 ## Lecture 09 ALU-Design
 
@@ -479,6 +542,7 @@ Chapter 11: Pipelined CPU Design
 + WB:将数据回写入寄存器文件
   + Reg[IR[20-16]] = MDR
 
+### Consider ``R-type`` instruction
 + `R-type instructions中只有``IF ID EX WB``四个阶段`
 + 因为Load操作和R-type的操作步骤不一样，在执行流水化进程的时候可能会出现问题
   + 所以R-type同样使用五步，只是``MEM``是一个什么都不做的阶段``nothing is executed in this stage``
@@ -516,8 +580,10 @@ Chapter 11: Pipelined CPU Design
 
 + Handling data hazards
   + Method1 : ``inserting NOP``
+    + 使用编译器来解决hazards，这一策略会减缓CPU的速度
   + Method2 : ``Forwarding`` (for R-type instructions)
     + Hardware solution, feed the $2 values directly to ALU read-in ports. Don’t have to wait until the WB stage.
+    + 直接将值送到后面的步骤去，不等待
   + Method3 : ``Stalling`` (for load instructions)
     + Stall pipeline by “freezing” or duplicating the control/data values. Namely,
  inserting a bubble in the pipeline.
@@ -541,7 +607,7 @@ Chapter 11: Pipelined CPU Design
 
 ### Network, internetwork, and Internet
 
-+ ``Network``：composed of several nods which are connected by the links
++ ``Network``：composed of several nodes which are connected by the links
   + A ``node`` 可以是笔记本，台式机，打印机或者是手机，或者也可以是路由器和交换机
   + 可以是有线或无线的
 + ``Internetwork``: `multiple networks interconnected`（路由器）``Network of Networks``
@@ -652,12 +718,17 @@ Chapter 11: Pipelined CPU Design
 one application layer
 
 ### Layers:
-  1. ``Pysical Layer``
+  1. ``Pysical Layer``:
+     1. transmitting physical bits  between two adjacent network elements
+     2. 网线，光纤 Twisted Pair, Fibre Optic
   2. ``Link Layer``
+    + transmitting a packet between two network elements
     + Link layer protocol: ``Ethernet, WiFi``
   3. ``Network Layer``
+    + transmitting a packet between ``two hosts`` in the Internet
     + protocol: ``IP protocol, many routing protocols``
   4. ``Transport Layer``
+    + Transmitting a ``data segment`` between ``two applications`` over the network
     + protocol: ``TCP,UDP``
      + TCP protocol: 
        + 为程序提供了面向连接的服务
@@ -666,7 +737,7 @@ one application layer
        + Provides congestion control - 如果网络拥塞，那么源会限制其传输速率
      + UDP protocal:
        + ``Connection less, no guarantee, no flow/congestion control.``
-  5. Application Layer
+  5. ``Application Layer``
     + protocol:
       + ``HTTP``: for Web document request and transfer
       + ``SMTP``: E-mail message transfer
@@ -752,7 +823,7 @@ one application layer
     + 可以使用``reconfigurable circuits``可重构电路来实现
   + `Routing processor 路由处理器`
     + 执行``routing protocols``路由协议并维护路由表和有关链接状态的信息
-  + `utput port 输出端口`
+  + `output port 输出端口`
     + ``Modify packet heads`` according to routing results 修改数据包头
     + 执行``Network/Link/Pysical layers protocols``来重新把heads加上
     + 包含输出缓冲器``output buffer``
