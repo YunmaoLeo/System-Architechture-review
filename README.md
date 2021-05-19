@@ -166,7 +166,10 @@
 
 ### CPU Clocking
 + Clock cycle time(clock tick时钟周期): 每一clock周期所花费的时间，clock一般指processor clock
+  + 250ps = 0.25ns = 250 * 10^(-12)s
+    + ps: picosecond
 + Clock frequency(clock rate时钟频率): cycles per second每秒能实现运行周期，是clock period的负数
+  + 4.0GHz = 4000MHz = 4.0 * 10^9 Hz
 
 ### CPU Time
 + ``CPU Time = CPU Clock Cycles * Clock Cycle Time``
@@ -213,6 +216,7 @@
     + ``Energy 正比于 0.5 x Capacitive load x Voltage^2``
   + The power required per transistor dependes on the capacitive loading, voltage and the frequency of transitions:
     + ``Power 正比于 0.5 x Capacitive load x Voltage^2 x Frequency``
+    + 此处的Frequency就是CPU Clock Rate/CPU Frequency ``1.0 GHz = 1 *10^9 Hz
 
 ### Amdahl's Law
 + Amdahl's law: The performance enhancement possible with a given improvement is limitied by the amount that the improved feature is used
